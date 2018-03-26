@@ -34,13 +34,13 @@ Command        Parameters                    Description
 _________________________________________________________________________________________________
 Help                                         Display this help
 
-Connect        -ServerAddress                Connect to server located at server address
+Connect        ServerAddress                Connect to server located at server address
 
 LogIn          -u Username -p Password       Log in to selected server with provided credentials
 
 List                                         Get a list of online users
 
-Chat           -UserId                       Start chat with available user
+Chat           UserId                       Start chat with available user
 
 Exit                                         Exit from chat and application
 ________________________________________________________________________________________________";
