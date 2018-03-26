@@ -1,15 +1,19 @@
-﻿using System;
+﻿using ChainSaw.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ChainSaw.Client.Console
 {
     public interface IChatClient
     {
-        event EventHandler ConnectionRequested;
-        event EventHandler MessageReceived;
+        event EventHandler<GenericEventArgs<ConnectionRequest>> ConnectionRequested;
+        event EventHandler<GenericEventArgs<string>> MessageReceived;
 
-        bool SetServerAddress(string address);
-        void Login(string username, string password);
+        Task<bool> SetServerAddress(string address);
+        Task<bool> Login(string username, string password);
+        Task<List<UserInfo>> GetUsersList();
+        Task<bool> RequestChat(string v);
     }
 }

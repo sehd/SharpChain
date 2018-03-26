@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ChainSaw.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Con = System.Console;
@@ -16,26 +18,15 @@ namespace ChainSaw.Client.Console
         {
             chatClient = IocContainer.Resolve<IChatClient>();
             chatClient.ConnectionRequested += ChatClient_ConnectionRequested;
-            chatClient.MessageReceived += ChatClient_MessageReceived;
         }
 
-        private void ChatClient_MessageReceived(object sender, EventArgs e)
+        private void ChatClient_ConnectionRequested(object sender, GenericEventArgs<ConnectionRequest> e)
         {
             readCancellationSource.Cancel(true);
             var color = Con.ForegroundColor;
             Con.ForegroundColor = ConsoleColor.Cyan;
             Con.SetCursorPosition(0, Con.CursorTop);
-            Con.WriteLine("Connection requested");
-            Con.ForegroundColor = color;
-        }
-
-        private void ChatClient_ConnectionRequested(object sender, EventArgs e)
-        {
-            readCancellationSource.Cancel(true);
-            var color = Con.ForegroundColor;
-            Con.ForegroundColor = ConsoleColor.Cyan;
-            Con.SetCursorPosition(0, Con.CursorTop);
-            Con.WriteLine("Connection requested");
+            Con.WriteLine(Resources.GetConnectionRequestMessage(e.Content.FromUserId));
             Con.ForegroundColor = color;
         }
 
@@ -45,9 +36,9 @@ namespace ChainSaw.Client.Console
             var command = "";
             do
             {
-                Con.Write("> ");
+                Con.Write("\n> ");
                 readCancellationSource = new CancellationTokenSource();
-                command = CancellableRead(readCancellationSource.Token);
+                command = Extensions.CancellableReadLine(readCancellationSource.Token);
                 var args = new Dictionary<string, string>();
                 if (!string.IsNullOrEmpty(command))
                 {
@@ -65,60 +56,102 @@ namespace ChainSaw.Client.Console
                                     i++;
                                 }
                                 else
-                                {
                                     args.Add("", splitCommand[i]);
-                                }
                             }
                         }
                     }
                     catch
                     {
-                        Con.WriteLine("Error parsing command. Checkout 'Help' for more info");
+                        Con.WriteLine(Resources.CommandError);
                         continue;
                     }
                     switch (command)
                     {
                         case "connect":
-                            if (args.Count != 1 || !args.ContainsKey(""))
-                                Con.WriteLine("Invalid parameters");
-                            else
-                                chatClient.SetServerAddress(args[""]);
+                            Connect(args);
                             break;
                         case "login":
-                            if (args.Count != 2 || !args.ContainsKey("u") || !args.ContainsKey("p"))
-                                Con.WriteLine("Invalid parameters");
-                            else
-                                chatClient.Login(args["u"], args["p"]);
+                            Login(args);
                             break;
                         case "list":
+                            List();
                             break;
                         case "chat":
+                            Chat(args);
+                            break;
+                        case "accept":
+                            Accept(args);
                             break;
                         case "help":
                             Con.WriteLine(Resources.Help);
                             break;
                         default:
-                            Con.WriteLine("Unknown command");
+                            Con.WriteLine(Resources.UnknownCommand);
                             break;
                     }
                 }
             } while (command != "exit");
         }
 
-        private string CancellableRead(CancellationToken cancellationToken)
+        private void Accept(Dictionary<string, string> args)
         {
-            var res = Task.Run(() =>
+            if (args.Count != 1 || !args.ContainsKey(""))
+                Con.WriteLine(Resources.InvalidParameters);
+            else
             {
-                return Con.ReadLine();
-            });
-            try
-            {
-                res.Wait(cancellationToken);
-                return res.Result;
+
             }
-            catch
+        }
+
+        private void Chat(Dictionary<string, string> args)
+        {
+            if (args.Count != 1 || !args.ContainsKey(""))
+                Con.WriteLine(Resources.InvalidParameters);
+            else
             {
-                return "";
+                var res=chatClient.RequestChat(args[""])
+            }
+        }
+
+        private void List()
+        {
+            var res = chatClient.GetUsersList();
+            if (res.WaitHandled())
+            {
+                var users = res.Result.Select(obj => $"{obj.UserId}\t\t{(obj.IsConnected ? Resources.StatusOnline : Resources.StatusOffline)}\t\t{(obj.IsAvailable ? Resources.UserAvailable : Resources.UserUnavailable)}");
+                Con.WriteLine(string.Join("\n", users));
+            }
+            else
+            {
+                Con.WriteLine(Resources.GetListUnsuccessful);
+            }
+        }
+
+        private void Login(Dictionary<string, string> args)
+        {
+            if (args.Count != 2 || !args.ContainsKey("u") || !args.ContainsKey("p"))
+                Con.WriteLine(Resources.InvalidParameters);
+            else
+            {
+                var res = chatClient.Login(args["u"], args["p"]);
+                if (res.WaitHandled() && res.Result)
+                    Con.WriteLine(Resources.LoginSuccess);
+                else
+                    Con.WriteLine(Resources.LoginFail);
+            }
+        }
+
+        private void Connect(Dictionary<string, string> args)
+        {
+            if (args.Count != 1 || !args.ContainsKey(""))
+                Con.WriteLine(Resources.InvalidParameters);
+            else
+            {
+                var res = chatClient.SetServerAddress(args[""]);
+                if (res.WaitHandled() && res.Result)
+                    Con.WriteLine(Resources.ConnectionSuccess);
+                else
+                    Con.WriteLine(Resources.ConnectionFail);
             }
         }
     }
