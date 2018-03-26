@@ -7,5 +7,9 @@ namespace ChainSaw.Client.Console
     [ContainAs(typeof(IEncryptionHelper))]
     public class EncryptionHelper : IEncryptionHelper
     {
+        public EncryptionHelper()
+        {
+
+        }
     }
 }

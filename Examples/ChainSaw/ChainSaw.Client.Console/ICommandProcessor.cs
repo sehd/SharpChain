@@ -4,8 +4,8 @@ using System.Text;
 
 namespace ChainSaw.Client.Console
 {
-    [ContainAs(typeof(IChatClient))]
-    public class ChatClient : IChatClient
+    public interface ICommandProcessor
     {
+        void Run();
     }
 }

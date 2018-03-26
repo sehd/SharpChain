@@ -41,7 +41,7 @@ namespace ChainSaw
                 var assemblies = GetAssemblies(rootAssembly);
                 foreach (var assembly in assemblies)
                 {
-                    if (assembly.FullName.StartsWith("Rayanmehr"))
+                    if (assembly.FullName.StartsWith("ChainSaw"))
                         RegisterTypesInAssembly(assembly);
                 }
             }
