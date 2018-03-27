@@ -74,7 +74,10 @@ ________________________________________________________________________________
         public const string InvalidParameters = "Invalid parameters";
         public const string UnknownCommand = "Unknown command";
         public const string GetListUnsuccessful = "Getting list of users failed. Please check connection and try again";
+        public const string CreateChatError = "Starting chat failed. Please try again.";
+        public const string AcceptFailed = "Chat request could not be accepted. Either request is not present or other user unavailable.";
 
         public static string GetConnectionRequestMessage(string from) => $"Connection requested from {from}";
+        public static string ChatRequestRejected(string userId) => $"Your chat request rejected by {userId}";
     }
 }

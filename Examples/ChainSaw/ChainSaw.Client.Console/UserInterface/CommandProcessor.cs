@@ -1,4 +1,5 @@
-﻿using ChainSaw.Models;
+﻿using ChainSaw.Client.Console.Core;
+using ChainSaw.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,16 +7,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Con = System.Console;
 
-namespace ChainSaw.Client.Console
+namespace ChainSaw.Client.Console.UserInterface
 {
     [ContainAs(typeof(ICommandProcessor))]
     public class CommandProcessor : ICommandProcessor
     {
         private CancellationTokenSource readCancellationSource;
         private IChatClient chatClient;
+        private IChatView chatView;
 
         public CommandProcessor()
         {
+            chatView = IocContainer.Resolve<IChatView>();
             chatClient = IocContainer.Resolve<IChatClient>();
             chatClient.ConnectionRequested += ChatClient_ConnectionRequested;
         }
@@ -99,7 +102,15 @@ namespace ChainSaw.Client.Console
                 Con.WriteLine(Resources.InvalidParameters);
             else
             {
-
+                var res = chatClient.AcceptChatRequest(args[""]);
+                if (res.WaitHandled() && res.Result)
+                {
+                    chatView.EnterChatMode();
+                }
+                else
+                {
+                    Con.WriteLine(Resources.AcceptFailed);
+                }
             }
         }
 
@@ -109,7 +120,22 @@ namespace ChainSaw.Client.Console
                 Con.WriteLine(Resources.InvalidParameters);
             else
             {
-                var res=chatClient.RequestChat(args[""])
+                var res = chatClient.RequestChat(args[""]);
+                if (res.WaitHandled(TimeSpan.FromMinutes(1)))
+                {
+                    if (res.Result)
+                    {
+                        chatView.EnterChatMode();
+                    }
+                    else
+                    {
+                        Con.WriteLine(Resources.ChatRequestRejected(args[""]));
+                    }
+                }
+                else
+                {
+                    Con.WriteLine(Resources.CreateChatError);
+                }
             }
         }
 

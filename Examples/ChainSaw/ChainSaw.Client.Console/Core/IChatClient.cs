@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChainSaw.Client.Console
+namespace ChainSaw.Client.Console.Core
 {
     public interface IChatClient
     {
@@ -14,6 +14,7 @@ namespace ChainSaw.Client.Console
         Task<bool> SetServerAddress(string address);
         Task<bool> Login(string username, string password);
         Task<List<UserInfo>> GetUsersList();
-        Task<bool> RequestChat(string v);
+        Task<bool> RequestChat(string userId);
+        Task<bool> AcceptChatRequest(string userId);
     }
 }

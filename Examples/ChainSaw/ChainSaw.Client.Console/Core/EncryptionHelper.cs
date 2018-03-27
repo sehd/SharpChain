@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ChainSaw.Client.Console
+namespace ChainSaw.Client.Console.Core
 {
     [ContainAs(typeof(IEncryptionHelper))]
     public class EncryptionHelper : IEncryptionHelper

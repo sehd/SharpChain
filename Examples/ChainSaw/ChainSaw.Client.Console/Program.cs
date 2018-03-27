@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChainSaw.Client.Console.UserInterface;
+using System;
 using Con = System.Console;
 
 namespace ChainSaw.Client.Console

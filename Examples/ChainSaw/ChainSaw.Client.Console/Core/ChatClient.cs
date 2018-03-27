@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ChainSaw.Models;
 
-namespace ChainSaw.Client.Console
+namespace ChainSaw.Client.Console.Core
 {
     [ContainAs(typeof(IChatClient))]
     public class ChatClient : IChatClient
