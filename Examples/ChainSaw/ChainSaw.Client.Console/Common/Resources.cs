@@ -1,4 +1,6 @@
-﻿namespace ChainSaw.Client.Console
+﻿using System;
+
+namespace ChainSaw.Client.Console
 {
     static class Resources
     {
@@ -76,8 +78,10 @@ ________________________________________________________________________________
         public const string GetListUnsuccessful = "Getting list of users failed. Please check connection and try again";
         public const string CreateChatError = "Starting chat failed. Please try again.";
         public const string AcceptFailed = "Chat request could not be accepted. Either request is not present or other user unavailable.";
+        public const string ChatSessionEnded = "Chat session ended. You are back at command console.";
 
         public static string GetConnectionRequestMessage(string from) => $"Connection requested from {from}";
         public static string ChatRequestRejected(string userId) => $"Your chat request rejected by {userId}";
+        public static string EnterChatMessage(string chattingWith) => $"You are now chatting with {chattingWith}.\nStart typing messages and press enter to send.\nType in 'Exit Chat' to exit chat and return to command console.";
     }
 }
