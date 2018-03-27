@@ -234,5 +234,10 @@ namespace ChainSaw
                 return false;
             }
         }
+
+        public static string HashPassword(this string password)
+        {
+            return password;
+        }
     }
 }
