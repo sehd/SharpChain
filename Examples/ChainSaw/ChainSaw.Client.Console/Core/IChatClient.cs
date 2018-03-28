@@ -16,7 +16,7 @@ namespace ChainSaw.Client.Console.Core
         Task<List<UserInfo>> GetUsersList();
         Task<bool> RequestChat(string userId);
         Task<bool> AcceptChatRequest(string userId);
-        Task SendMessage(string message);
+        Task SendMessage(Message message);
         Task EndChat();
 
         string ConnectedServerAddress { get; }

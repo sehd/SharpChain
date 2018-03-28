@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Con = System.Console;
 using System.Threading;
+using ChainSaw.Models;
 
 namespace ChainSaw.Client.Console.UserInterface
 {
@@ -30,7 +31,11 @@ namespace ChainSaw.Client.Console.UserInterface
                 message = Extensions.CancellableReadLine(readCancellationSource.Token);
                 if (!string.IsNullOrEmpty(message))
                 {
-                    chatClient.SendMessage(message).Wait();
+                    chatClient.SendMessage(new Message()
+                    {
+                        Command = "Text",
+                        Parameters = message
+                    }).Wait();
                 }
             } while (message.ToLower() != "exit chat" && !sessionEndFlag);
             ExitChatMode();

@@ -4,6 +4,7 @@ using Con = System.Console;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace ChainSaw
 {
@@ -237,7 +238,9 @@ namespace ChainSaw
 
         public static string HashPassword(this string password)
         {
-            return password;
+            var passBytes = Encoding.UTF8.GetBytes(password);
+            var resBytes = SHA256.Create().ComputeHash(passBytes);
+            return Convert.ToBase64String(resBytes);
         }
     }
 }
