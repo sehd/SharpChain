@@ -63,6 +63,7 @@ namespace ChainSaw.Client.Console.UserInterface
             Con.WriteLine(chatClient.ChattingWith + ":");
             Con.WriteLine(e.Content);
             Con.WriteLine();
+            Con.WriteLine();
             Con.ForegroundColor = color;
             if (e.Content.ToLower() == "exit chat")
             {

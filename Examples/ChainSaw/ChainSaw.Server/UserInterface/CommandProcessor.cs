@@ -1,4 +1,5 @@
-﻿using ChainSaw.Server.Core;
+﻿using ChainSaw.Models;
+using ChainSaw.Server.Core;
 using ChainSaw.Server.Data;
 using ChainSaw.Server.Data.Model;
 using System;
@@ -11,11 +12,12 @@ namespace ChainSaw.Server.UserInterface
     [ContainAs(typeof(ICommandProcessor))]
     public class CommandProcessor : ICommandProcessor
     {
-        IMqttServerManager mqttServer;
+        private readonly IMqttServerManager mqttServer;
 
         public CommandProcessor()
         {
             mqttServer = IocContainer.Resolve<IMqttServerManager>();
+            IocContainer.Resolve<IMessageProcessor>().Start(mqttServer);
         }
 
         public void Run()
@@ -57,6 +59,9 @@ namespace ChainSaw.Server.UserInterface
                         case "start":
                             mqttServer.Start().Wait();
                             break;
+                        case "send":
+                            SendMessage(args);
+                            break;
                         case "user-list":
                             ListUsers();
                             break;
@@ -72,6 +77,15 @@ namespace ChainSaw.Server.UserInterface
                     }
                 }
             } while (command != "exit");
+        }
+
+        private void SendMessage(Dictionary<string, string> args)
+        {
+            mqttServer.SendMessage(new Message()
+            {
+                Command = "Text",
+                Parameters = args["m"]
+            },args["to"]);
         }
 
         private void ListUsers()

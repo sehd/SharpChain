@@ -224,7 +224,7 @@ namespace ChainSaw
         {
             try
             {
-                task.Wait(timeout ?? TimeSpan.FromSeconds(5));
+                task.Wait(timeout ?? TimeSpan.FromSeconds(60));
                 if (task.IsCompleted)
                     return true;
                 else

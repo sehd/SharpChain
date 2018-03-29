@@ -6,6 +6,7 @@ using MQTTnet.Protocol;
 using MQTTnet.Server;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,14 +16,16 @@ namespace ChainSaw.Server.Core
     [ContainAs(typeof(IMqttServerManager))]
     public class MqttServerManager : IMqttServerManager
     {
-        IMqttServer server;
-        private IMessageProcessor messageProcessor;
+        private readonly IMqttServer server;
+        private List<ConnectionInfo> connections;
+
+        public event EventHandler<GenericEventArgs<Message>> MessageReceived;
 
         public MqttServerManager()
         {
-            messageProcessor = IocContainer.Resolve<IMessageProcessor>();
+            connections = new List<ConnectionInfo>();
             server = new MqttFactory().CreateMqttServer();
-            server.ApplicationMessageReceived += MessageReceived;
+            server.ApplicationMessageReceived += OnMessageReceived;
             server.ClientConnected += ClientConnected;
             server.ClientDisconnected += ClientDisconnected;
         }
@@ -30,18 +33,27 @@ namespace ChainSaw.Server.Core
         private void ClientDisconnected(object sender, MqttClientDisconnectedEventArgs e)
         {
             LogHelper.Debug(this, "Client Connected");
+            connections.RemoveAll(obj => obj.UserName == e.Client.ClientId);
         }
 
         private void ClientConnected(object sender, MqttClientConnectedEventArgs e)
         {
             LogHelper.Debug(this, "Client Connected");
+            connections.Add(new ConnectionInfo()
+            {
+                UserName = e.Client.ClientId
+            });
         }
 
-        private void MessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
+        private void OnMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
-            var data = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-            var message = JsonConvert.DeserializeObject<Message>(data);
-            messageProcessor.ProcessMessage(message);
+            if (!string.IsNullOrEmpty(e.ClientId))
+            {
+                var data = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                var message = JsonConvert.DeserializeObject<Message>(data);
+                message.SenderId = e.ClientId;
+                MessageReceived?.Invoke(this, new GenericEventArgs<Message>(message));
+            }
         }
 
         public async Task Start()
@@ -67,6 +79,47 @@ namespace ChainSaw.Server.Core
                 c = Console.ReadKey().KeyChar;
             }
             await server.StopAsync();
+        }
+
+        public List<UserInfo> GetOnlineUsersList()
+        {
+            return connections.Select(obj => new UserInfo()
+            {
+                UserId = obj.UserName,
+                IsAvailable = string.IsNullOrEmpty(obj.InChatWith),
+                IsConnected = true,
+            }).ToList();
+        }
+
+        public async Task SendMessage(Message message, string recipientId)
+        {
+            if (connections.Exists(obj => obj.UserName == recipientId))
+            {
+                var appMessage = new MqttApplicationMessageBuilder().WithTopic(recipientId).
+                    WithPayload(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message))).Build();
+                await server.PublishAsync(appMessage);
+            }
+            else
+                LogHelper.Warn(this, "Sending message to inactive client");
+        }
+
+        public void StartChat(params string[] users)
+        {
+            foreach (var user in users)
+            {
+                connections.First(obj => obj.UserName == user).InChatWith = 
+                    users.FirstOrDefault(obj => obj != user);
+            }
+        }
+
+        public string GetInChatWith(string userId)
+        {
+            return connections.FirstOrDefault(obj => obj.UserName == userId)?.InChatWith;
+        }
+
+        public void EndChat(string userId)
+        {
+            connections.FirstOrDefault(obj => obj.UserName == userId).InChatWith = null;
         }
     }
 }

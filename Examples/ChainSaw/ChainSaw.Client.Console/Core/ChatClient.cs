@@ -15,8 +15,8 @@ namespace ChainSaw.Client.Console.Core
     [ContainAs(typeof(IChatClient), IsSingleton = true)]
     public class ChatClient : IChatClient
     {
-        private IEncryptionHelper encryptionHelper;
-        private IMqttClient mqttClient;
+        private readonly IEncryptionHelper encryptionHelper;
+        private readonly IMqttClient mqttClient;
         private Message reply;
 
         public string ConnectedServerAddress { get; private set; }
@@ -49,7 +49,11 @@ namespace ChainSaw.Client.Console.Core
                 return reply;
             });
             if (bool.TryParse(res.Parameters, out bool reqResult))
+            {
+                if (reqResult)
+                    ChattingWith = userId;
                 return reqResult;
+            }
 
             return false;
         }
@@ -88,10 +92,10 @@ namespace ChainSaw.Client.Console.Core
             try
             {
                 var options = new MqttClientOptionsBuilder().WithTcpServer(ConnectedServerAddress).
-                    WithCredentials(username, password).Build();
+                    WithCredentials(username, password).WithClientId(username).Build();
                 await mqttClient.ConnectAsync(options);
                 LoggedInAs = username;
-                mqttClient.SubscribeAsync(LoggedInAs, MqttQualityOfServiceLevel.ExactlyOnce);
+                await mqttClient.SubscribeAsync(LoggedInAs, MqttQualityOfServiceLevel.ExactlyOnce);
                 return true;
             }
             catch (MqttConnectingFailedException ex)
@@ -129,7 +133,11 @@ namespace ChainSaw.Client.Console.Core
                 return reply;
             });
             if (bool.TryParse(res.Parameters, out bool reqResult))
+            {
+                if (reqResult)
+                    ChattingWith = userId;
                 return reqResult;
+            }
 
             return false;
         }
@@ -143,7 +151,7 @@ namespace ChainSaw.Client.Console.Core
             }
             var payload = JsonConvert.SerializeObject(message);
             await mqttClient.PublishAsync(new MqttApplicationMessageBuilder().
-                WithPayload(Encoding.UTF8.GetBytes(payload)).Build());
+                WithPayload(Encoding.UTF8.GetBytes(payload)).WithTopic("Server").Build());
         }
 
         public async Task<bool> SetServerAddress(string address)
@@ -177,17 +185,20 @@ namespace ChainSaw.Client.Console.Core
 
         private void MqttClient_ApplicationMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
-            var data = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-            var message = JsonConvert.DeserializeObject<Message>(data);
-            if (message.Command == "Text")
-                MessageReceived?.Invoke(this, new GenericEventArgs<string>(message.Parameters));
-            else if (message.Command == "ChatRequested")
+            if (e.ApplicationMessage.Topic == LoggedInAs)
             {
-                var req = JsonConvert.DeserializeObject<ConnectionRequest>(message.Parameters);
-                ConnectionRequested?.Invoke(this, new GenericEventArgs<ConnectionRequest>(req));
+                var data = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                var message = JsonConvert.DeserializeObject<Message>(data);
+                if (message.Command == "Text")
+                    MessageReceived?.Invoke(this, new GenericEventArgs<string>(message.Parameters));
+                else if (message.Command == "ChatRequested")
+                {
+                    var req = JsonConvert.DeserializeObject<ConnectionRequest>(message.Parameters);
+                    ConnectionRequested?.Invoke(this, new GenericEventArgs<ConnectionRequest>(req));
+                }
+                else
+                    reply = message;
             }
-            else
-                reply = message;
         }
 
         private void MqttClient_Disconnected(object sender, MqttClientDisconnectedEventArgs e)
