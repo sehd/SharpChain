@@ -15,6 +15,7 @@
     <Product>SharpChain</Product>
     <PackageIconUrl>https://raw.githubusercontent.com/sehd/SharpChain/master/icon.png</PackageIconUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
