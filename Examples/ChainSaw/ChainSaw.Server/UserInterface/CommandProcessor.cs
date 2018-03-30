@@ -71,6 +71,8 @@ namespace ChainSaw.Server.UserInterface
                         case "help":
                             Console.WriteLine(Resources.Help);
                             break;
+                        case "exit":
+                            break;
                         default:
                             Console.WriteLine(Resources.UnknownCommand);
                             break;

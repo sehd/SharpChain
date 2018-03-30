@@ -119,7 +119,9 @@ namespace ChainSaw.Server.Core
 
         public void EndChat(string userId)
         {
-            connections.FirstOrDefault(obj => obj.UserName == userId).InChatWith = null;
+            var user = connections.FirstOrDefault(obj => obj.UserName == userId);
+            if (user != null)
+                user.InChatWith = null;
         }
     }
 }

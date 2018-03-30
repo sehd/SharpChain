@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Lib\SigmaSharp.SharpChain\SigmaSharp.SharpChain.csproj" />
     <ProjectReference Include="..\ChainSaw.Shared\ChainSaw.Shared.csproj" />
   </ItemGroup>
 

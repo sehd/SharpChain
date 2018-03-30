@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Con = System.Console;
 using System.Threading;
 using ChainSaw.Models;
+using SigmaSharp.SharpChain;
+using Newtonsoft.Json;
 
 namespace ChainSaw.Client.Console.UserInterface
 {
@@ -13,6 +15,7 @@ namespace ChainSaw.Client.Console.UserInterface
         private bool sessionEndFlag;
         private CancellationTokenSource readCancellationSource;
         private IChatClient chatClient;
+        private Chain<string, byte[]> chain;
 
         public ChatView()
         {
@@ -22,6 +25,7 @@ namespace ChainSaw.Client.Console.UserInterface
         public void EnterChatMode()
         {
             sessionEndFlag = false;
+            chain = ChainFactory.Create<string>();
             chatClient.MessageReceived += ChatClient_MessageReceived;
             Con.WriteLine(Resources.EnterChatMessage(chatClient.ChattingWith));
             var message = "";
@@ -31,11 +35,7 @@ namespace ChainSaw.Client.Console.UserInterface
                 message = Extensions.CancellableReadLine(readCancellationSource.Token);
                 if (!string.IsNullOrEmpty(message))
                 {
-                    chatClient.SendMessage(new Message()
-                    {
-                        Command = "Text",
-                        Parameters = message
-                    }).Wait();
+                    SendMessage(message);
                 }
             } while (message.ToLower() != "exit chat" && !sessionEndFlag);
             ExitChatMode();
@@ -53,7 +53,37 @@ namespace ChainSaw.Client.Console.UserInterface
             }
         }
 
+        private void SendMessage(string message)
+        {
+            var hash = chain.CreateBlock(message);
+            var blockMessage = new BlockMessage()
+            {
+                Message = message,
+                Hash = hash
+            };
+            chatClient.SendMessage(new Message()
+            {
+                Command = "Text",
+                Parameters = JsonConvert.SerializeObject(blockMessage)
+            }).Wait();
+            chain.AddBlock(message, hash);
+        }
+
         private void ChatClient_MessageReceived(object sender, GenericEventArgs<string> e)
+        {
+            var blockMessage = JsonConvert.DeserializeObject<BlockMessage>(e.Content);
+            if (chain.AddBlock(blockMessage.Message, blockMessage.Hash))
+            {
+                ShowMessage(blockMessage.Message);
+                if (e.Content.ToLower() == "exit chat")
+                {
+                    Con.WriteLine(Resources.ChatSessionEnded);
+                    ExitChatMode();
+                }
+            }
+        }
+
+        private void ShowMessage(string message)
         {
             if (readCancellationSource != null)
                 readCancellationSource.Cancel();
@@ -61,15 +91,11 @@ namespace ChainSaw.Client.Console.UserInterface
             Con.ForegroundColor = ConsoleColor.Yellow;
             Con.SetCursorPosition(0, Con.CursorTop);
             Con.WriteLine(chatClient.ChattingWith + ":");
-            Con.WriteLine(e.Content);
+            Con.WriteLine(message);
             Con.WriteLine();
             Con.WriteLine();
             Con.ForegroundColor = color;
-            if (e.Content.ToLower() == "exit chat")
-            {
-                Con.WriteLine(Resources.ChatSessionEnded);
-                ExitChatMode();
-            }
+            
         }
     }
 }
