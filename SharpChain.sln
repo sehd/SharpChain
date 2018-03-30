@@ -17,7 +17,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChainSaw.Client.Console", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SigmaSharp.SharpChain", "Lib\SigmaSharp.SharpChain\SigmaSharp.SharpChain.csproj", "{54232655-98E5-4901-967E-6D4534252C8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChainSaw.Shared", "Examples\ChainSaw\ChainSaw.Shared\ChainSaw.Shared.csproj", "{B723AD40-0100-4E58-8E78-295284055209}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChainSaw.Shared", "Examples\ChainSaw\ChainSaw.Shared\ChainSaw.Shared.csproj", "{B723AD40-0100-4E58-8E78-295284055209}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{9DD0A8A5-1BDE-409F-B7ED-9583B46A1892}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
