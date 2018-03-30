@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Emad Hosseini</Authors>
+    <Company>www.sehd.ir</Company>
+    <Title>SigmaSharp SharpChain</Title>
+    <Description>A simple blockchain framework for .Net</Description>
+    <Summary>SharpChain is a .Net blockchain framework that will abstract away any blockchain implementation details. For more info and how to use it check out github page.</Summary>
+    <PackageReleaseNotes>This is still preliminary versions. More complete code on it's way.</PackageReleaseNotes>
+    <PackageLicenseUrl>https://github.com/sehd/SharpChain/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/sehd/SharpChain</PackageProjectUrl>
+    <PackageTags>Blockchain Chain Block-Chain</PackageTags>
+    <Copyright>Ⓒ 2018 Emad Hosseini</Copyright>
+    <Product>SharpChain</Product>
+    <PackageIconUrl>https://github.com/sehd/SharpChain/blob/master/icon.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>

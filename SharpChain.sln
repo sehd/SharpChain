@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{9DD0A8A5-1BDE-409F-B7ED-9583B46A1892}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		icon.png = icon.png
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
