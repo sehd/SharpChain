@@ -1,4 +1,5 @@
 ﻿using ChainSaw.Client.Console.UserInterface;
+using ChainSaw.CommandProcessor;
 using System;
 using Con = System.Console;
 

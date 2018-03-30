@@ -1,9 +1,8 @@
-﻿using ChainSaw.Server.Data;
-using ChainSaw.Server.Data.Model;
+﻿using ChainSaw.CommandProcessor;
+using ChainSaw.Server.Data;
 using ChainSaw.Server.UserInterface;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 
 namespace ChainSaw.Server
 {
@@ -12,7 +11,7 @@ namespace ChainSaw.Server
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(Resources.AppDescription);
+            Console.WriteLine(Resources.ServerDescription);
             Console.ForegroundColor = ConsoleColor.White;
 
             using (var db = new ChainSawDbContext())

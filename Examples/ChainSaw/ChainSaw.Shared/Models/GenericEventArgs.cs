@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ChainSaw
+namespace ChainSaw.Models
 {
     public class GenericEventArgs<T> : EventArgs
     {

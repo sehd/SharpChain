@@ -1,9 +1,4 @@
-﻿using ChainSaw.Server.Data.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ChainSaw.Server.Core
+﻿namespace ChainSaw.Server.Core
 {
     class ConnectionInfo
     {

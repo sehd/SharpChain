@@ -1,10 +1,10 @@
 ﻿using System;
 using Con = System.Console;
 
-namespace ChainSaw.Client.Console
+namespace ChainSaw
 {
     [ContainAs(typeof(ILogger))]
-    public class Logger : ILogger
+    public class ConsoleLogger : ILogger
     {
         public void Debug(Type type, string typeName, string methodName, string group, string message)
         {

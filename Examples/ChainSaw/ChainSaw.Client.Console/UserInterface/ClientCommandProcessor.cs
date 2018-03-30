@@ -1,22 +1,21 @@
 ﻿using ChainSaw.Client.Console.Core;
+using ChainSaw.CommandProcessor;
 using ChainSaw.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Con = System.Console;
 
 namespace ChainSaw.Client.Console.UserInterface
 {
     [ContainAs(typeof(ICommandProcessor))]
-    public class CommandProcessor : ICommandProcessor
+    public class ClientCommandProcessor : CommandProcessorBase
     {
-        private CancellationTokenSource readCancellationSource;
         private IChatClient chatClient;
         private IChatView chatView;
 
-        public CommandProcessor()
+        public ClientCommandProcessor()
         {
             chatView = IocContainer.Resolve<IChatView>();
             chatClient = IocContainer.Resolve<IChatClient>();
@@ -33,69 +32,34 @@ namespace ChainSaw.Client.Console.UserInterface
             Con.ForegroundColor = color;
         }
 
-        public void Run()
+        public override void ExecuteCommand(string command, Dictionary<string, string> args)
         {
-            Con.WriteLine(Resources.AwaitingCommands);
-            var command = "";
-            do
+            switch (command)
             {
-                Con.Write("\n> ");
-                readCancellationSource = new CancellationTokenSource();
-                command = Extensions.CancellableReadLine(readCancellationSource.Token);
-                var args = new Dictionary<string, string>();
-                if (!string.IsNullOrEmpty(command))
-                {
-                    try
-                    {
-                        var splitCommand = command.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        command = splitCommand[0].ToLower();
-                        if (splitCommand.Length > 1)
-                        {
-                            for (int i = 1; i < splitCommand.Length; i++)
-                            {
-                                if (splitCommand[i].StartsWith("-"))
-                                {
-                                    args.Add(splitCommand[i].TrimStart('-'), splitCommand[i + 1]);
-                                    i++;
-                                }
-                                else
-                                    args.Add("", splitCommand[i]);
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Con.WriteLine(Resources.CommandError);
-                        continue;
-                    }
-                    switch (command)
-                    {
-                        case "connect":
-                            Connect(args);
-                            break;
-                        case "login":
-                            Login(args);
-                            break;
-                        case "list":
-                            List();
-                            break;
-                        case "chat":
-                            Chat(args);
-                            break;
-                        case "accept":
-                            Accept(args);
-                            break;
-                        case "help":
-                            Con.WriteLine(Resources.Help);
-                            break;
-                        case "exit":
-                            break;
-                        default:
-                            Con.WriteLine(Resources.UnknownCommand);
-                            break;
-                    }
-                }
-            } while (command != "exit");
+                case "connect":
+                    Connect(args);
+                    break;
+                case "login":
+                    Login(args);
+                    break;
+                case "list":
+                    List();
+                    break;
+                case "chat":
+                    Chat(args);
+                    break;
+                case "accept":
+                    Accept(args);
+                    break;
+                case "help":
+                    Con.WriteLine(Resources.AppHelp);
+                    break;
+                case "exit":
+                    break;
+                default:
+                    Con.WriteLine(Resources.UnknownCommand);
+                    break;
+            }
         }
 
         private void Accept(Dictionary<string, string> args)

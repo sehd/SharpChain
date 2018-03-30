@@ -48,14 +48,7 @@ namespace ChainSaw.Client.Console.Core
                     Thread.Sleep(50);
                 return reply;
             });
-            if (bool.TryParse(res.Parameters, out bool reqResult))
-            {
-                if (reqResult)
-                    ChattingWith = userId;
-                return reqResult;
-            }
-
-            return false;
+            return CheckChatStarted(res,userId);
         }
 
         public async Task EndChat()
@@ -91,11 +84,7 @@ namespace ChainSaw.Client.Console.Core
             }
             try
             {
-                var options = new MqttClientOptionsBuilder().WithTcpServer(ConnectedServerAddress).
-                    WithCredentials(username, password).WithClientId(username).Build();
-                await mqttClient.ConnectAsync(options);
-                LoggedInAs = username;
-                await mqttClient.SubscribeAsync(LoggedInAs, MqttQualityOfServiceLevel.ExactlyOnce);
+                await ConnectToMqttServer(username, password);
                 return true;
             }
             catch (MqttConnectingFailedException ex)
@@ -132,14 +121,7 @@ namespace ChainSaw.Client.Console.Core
                     Thread.Sleep(50);
                 return reply;
             });
-            if (bool.TryParse(res.Parameters, out bool reqResult))
-            {
-                if (reqResult)
-                    ChattingWith = userId;
-                return reqResult;
-            }
-
-            return false;
+            return CheckChatStarted(res, userId);
         }
 
         public async Task SendMessage(Message message)
@@ -158,8 +140,7 @@ namespace ChainSaw.Client.Console.Core
         {
             try
             {
-                var options = new MqttClientOptionsBuilder().WithTcpServer(address).WithCredentials("aasoifa ;oihfa;osihfla", "aasdlfkbaw ia;woefh").Build();
-                await mqttClient.ConnectAsync(options);
+                await ConnectToMqttServer("sdfsfds", "asdf sf asdf asf");
                 ConnectedServerAddress = "";
                 return false;
             }
@@ -210,5 +191,27 @@ namespace ChainSaw.Client.Console.Core
         {
             //LogHelper.Info(this, "Connection Successful");
         }
+
+        private async Task ConnectToMqttServer(string username, string password)
+        {
+            var options = new MqttClientOptionsBuilder().WithTcpServer(ConnectedServerAddress).
+                    WithCredentials(username, password).WithClientId(username).Build();
+            await mqttClient.ConnectAsync(options);
+            LoggedInAs = username;
+            await mqttClient.SubscribeAsync(LoggedInAs, MqttQualityOfServiceLevel.ExactlyOnce);
+        }
+
+        private bool CheckChatStarted(Message res, string userId)
+        {
+            if (bool.TryParse(res.Parameters, out bool reqResult))
+            {
+                if (reqResult)
+                    ChattingWith = userId;
+                return reqResult;
+            }
+
+            return false;
+        }
+
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ChainSaw.Client.Console.UserInterface
+﻿namespace ChainSaw.Client.Console.UserInterface
 {
     public interface IChatView
     {

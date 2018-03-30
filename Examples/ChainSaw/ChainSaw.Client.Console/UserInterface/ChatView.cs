@@ -1,11 +1,11 @@
 ﻿using ChainSaw.Client.Console.Core;
 using System;
-using System.Collections.Generic;
 using Con = System.Console;
 using System.Threading;
 using ChainSaw.Models;
 using SigmaSharp.SharpChain;
 using Newtonsoft.Json;
+using ChainSaw.ConsoleHelper;
 
 namespace ChainSaw.Client.Console.UserInterface
 {
@@ -14,12 +14,13 @@ namespace ChainSaw.Client.Console.UserInterface
     {
         private bool sessionEndFlag;
         private CancellationTokenSource readCancellationSource;
-        private IChatClient chatClient;
+        private readonly IChatClient chatClient;
+        private readonly IConsoleHelper consoleHelper;
         private Chain<string, byte[]> chain;
-
         public ChatView()
         {
             chatClient = IocContainer.Resolve<IChatClient>();
+            consoleHelper = IocContainer.Resolve<IConsoleHelper>();
         }
 
         public void EnterChatMode()
@@ -32,7 +33,7 @@ namespace ChainSaw.Client.Console.UserInterface
             do
             {
                 readCancellationSource = new CancellationTokenSource();
-                message = Extensions.CancellableReadLine(readCancellationSource.Token);
+                message = consoleHelper.CancellableReadLine(readCancellationSource.Token);
                 if (!string.IsNullOrEmpty(message))
                 {
                     if (message.ToLower() == "show chain")
