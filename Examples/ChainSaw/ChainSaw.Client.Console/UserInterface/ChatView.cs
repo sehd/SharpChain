@@ -35,7 +35,10 @@ namespace ChainSaw.Client.Console.UserInterface
                 message = Extensions.CancellableReadLine(readCancellationSource.Token);
                 if (!string.IsNullOrEmpty(message))
                 {
-                    SendMessage(message);
+                    if (message.ToLower() == "show chain")
+                        ShowChain();
+                    else
+                        SendMessage(message);
                 }
             } while (message.ToLower() != "exit chat" && !sessionEndFlag);
             ExitChatMode();
@@ -51,6 +54,20 @@ namespace ChainSaw.Client.Console.UserInterface
                 chatClient.MessageReceived -= ChatClient_MessageReceived;
                 chatClient.EndChat().WaitHandled();
             }
+        }
+
+        private void ShowChain()
+        {
+            var messages = chain.ViewChain();
+            var color = Con.ForegroundColor;
+            Con.ForegroundColor = ConsoleColor.DarkBlue;
+            Con.WriteLine("Messages already in the chain are:");
+            foreach (var message in messages)
+            {
+                Con.WriteLine(message);
+            }
+            Con.WriteLine();
+            Con.ForegroundColor = color;
         }
 
         private void SendMessage(string message)
@@ -75,7 +92,7 @@ namespace ChainSaw.Client.Console.UserInterface
             if (chain.AddBlock(blockMessage.Message, blockMessage.Hash))
             {
                 ShowMessage(blockMessage.Message);
-                if (e.Content.ToLower() == "exit chat")
+                if (blockMessage.Message.ToLower() == "exit chat")
                 {
                     Con.WriteLine(Resources.ChatSessionEnded);
                     ExitChatMode();

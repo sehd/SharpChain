@@ -82,6 +82,6 @@ ________________________________________________________________________________
 
         public static string GetConnectionRequestMessage(string from) => $"Connection requested from {from}";
         public static string ChatRequestRejected(string userId) => $"Your chat request rejected by {userId}";
-        public static string EnterChatMessage(string chattingWith) => $"You are now chatting with {chattingWith}.\nStart typing messages and press enter to send.\nType in 'Exit Chat' to exit chat and return to command console.";
+        public static string EnterChatMessage(string chattingWith) => $"You are now chatting with {chattingWith}.\nStart typing messages and press enter to send.\nType in 'Exit Chat' to exit chat and return to command console.\nType in 'Show Chain' to see the messages already in your blockchain.";
     }
 }
