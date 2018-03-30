@@ -3,14 +3,16 @@ branches:
   only:
   - master
 image: Visual Studio 2017
+configuration: Release
 before_build:
 - cmd: nuget restore SharpChain.sln
 build:
   project: SharpChain.sln
   verbosity: minimal
+artifacts:
+- path: '\Lib\SigmaSharp.SharpChain\bin\Release\*.nupkg'
 deploy:
   provider: NuGet
   api_key:
     secure: wS/QhWwmJ8nzLttzgcRN9H1DYYVS/ZcdWW4KENbTqYxZP+zZChkhIOUOr4bgTqND
   skip_symbols: false
-  artifact: /.*\.nupkg/
